@@ -1,0 +1,1148 @@
+<?php
+function courses_menu() {
+    
+    $menu['cur/undergraduate'] = array(
+        'title' => 'Undergraduate Courses',
+        'page callback' => 'courses_page_level',
+        'page arguments' => array('undergraduate'),
+        'access arguments' => array('access content'),
+        'menu_name' => 'primary-links',
+        'file' => 'courses.pages.inc',
+        'type' => MENU_SUGGESTED_ITEM
+    );
+    
+    $menu['cur/graduate'] = array(
+        'title' => 'Graduate Courses',
+        'page callback' => 'courses_page_level',
+        'page arguments' => array('graduate'),
+        'access arguments' => array('access content'),
+        'menu_name' => 'primary-links',
+        'file' => 'courses.pages.inc',
+        'type' => MENU_SUGGESTED_ITEM
+    );
+
+    $result = db_query('SELECT term FROM {courses_terms} ORDER BY term');
+    while ($term_ = db_fetch_object($result)) {
+        $term = courses_term_load($term_->term);
+        
+        $menu['cur/' . $term->term] = array(
+            'title' => $term->term,
+            'page callback' => 'courses_page_term',
+            'page arguments' => array(1),
+            'access arguments' => array('access content'),
+            'menu_name' => 'courses',
+            'file' => 'courses.pages.inc'
+        );
+        
+        // These paths are intentionally in spanish
+        foreach ($term->courses as $level => $course_arr) {
+            foreach ($course_arr as $cid => $course_instance) {
+                $menu['cur/' . $term->term . '/' . $course_instance->code] = array(
+                    'title' => $course_instance->code . ' - ' . check_plain($course_instance->name),
+                    'page callback' => 'courses_page_course',
+                    'page arguments' => array(strval($cid)),
+                    'access arguments' => array('access content'),
+                    'menu_name' => 'courses',
+                    'file' => 'courses.pages.inc'
+                );
+               
+                $menu['cur/' . $term->term . '/' . $course_instance->code . '/programa'] = array(
+                    'title' => 'Programa',
+                    'page callback' => 'courses_page_program',
+                    'page arguments' => array(strval($cid)),
+                    'access arguments' => array('access content'),
+                    'menu_name' => 'courses',
+                    'file' => 'courses.pages.inc',
+                    'weight' => -10
+                );
+                
+                $menu['cur/' . $term->term . '/' . $course_instance->code . '/asesoria'] = array(
+                    'title' => 'Horarios de atención y talleres',
+                    'page callback' => 'courses_page_hours',
+                    'page arguments' => array(strval($cid)),
+                    'access arguments' => array('access content'),
+                    'menu_name' => 'courses',
+                    'file' => 'courses.pages.inc',
+                    'weight' => -9
+                );
+                
+                $menu['cur/' . $term->term . '/' . $course_instance->code . '/talleres'] = array(
+                    'title' => 'Talleres',
+                    'page callback' => 'courses_page_content_problem_sets',
+                    'page arguments' => array(strval($cid)),
+                    'access arguments' => array('access content'),
+                    'menu_name' => 'courses',
+                    'file' => 'courses.pages.inc',
+                );
+                
+                $menu['cur/' . $term->term . '/' . $course_instance->code . '/examenes'] = array(
+                    'title' => 'Exámenes',
+                    'page callback' => 'courses_page_content_exams',
+                    'page arguments' => array(strval($cid)),
+                    'access arguments' => array('access content'),
+                    'menu_name' => 'courses',
+                    'file' => 'courses.pages.inc',
+                );
+                
+                $menu['cur/' . $term->term . '/' . $course_instance->code . '/notas'] = array(
+                    'title' => 'Notas de clase',
+                    'page callback' => 'courses_page_content_notes',
+                    'page arguments' => array(strval($cid)),
+                    'access arguments' => array('access content'),
+                    'menu_name' => 'courses',
+                    'file' => 'courses.pages.inc',
+                );                
+                
+                $menu['cur/' . $term->term . '/' . $course_instance->code . '/eval'] = array(
+                    'title' => 'Programación de evaluaciones',
+                    'page callback' => 'courses_page_exams',
+                    'page arguments' => array(strval($cid)),
+                    'access arguments' => array('access content'),
+                    'menu_name' => 'courses',
+                    'file' => 'courses.pages.inc',
+                    'weight' => -8,
+                );
+
+                $menu['cur/' . $term->term . '/' . $course_instance->code . '/eval/%course_exam'] = array(
+                    'title' => 'Exam details',
+                    'title callback' => 'courses_exam_page_title',
+                    'title arguments' => array(4),
+                    'page callback' => 'courses_page_exam',
+                    'page arguments' => array(strval($cid), 4),
+                    'access arguments' => array('access content'),
+                    'menu_name' => 'courses',
+                    'file' => 'courses.pages.inc',
+                    'weight' => -8
+                );
+
+            }
+        }
+    }
+    
+    $menu['math/courses'] = array(
+        'title' => 'Courses',
+        'page callback' => 'courses_admin',
+        'access arguments' => array('administer courses'),
+        'file' => 'courses.admin.inc'
+    );
+
+    $menu['math/courses/courses'] = array(
+        'title' => 'Courses',
+        'page callback' => 'courses_admin',
+        'access arguments' => array('administer courses'),
+        'file' => 'courses.admin.inc'
+    );
+    
+    $menu['math/courses/courses/%course_meta/edit'] = array(
+        'title' => 'Course Information',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('courses_meta_form', 3),
+        'access arguments' => array('administer courses'),
+        'file' => 'courses.admin.inc'
+    );
+    
+    $menu['math/courses/courses/%course_meta/delete'] = array(
+        'title' => 'Delete course',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('courses_meta_delete_form', 3),
+        'access arguments' => array('administer courses'),
+        'file' => 'courses.admin.inc'
+    );
+    
+    $menu['math/courses/terms'] = array(
+        'title' => 'Terms',
+        'page callback' => 'courses_admin_terms',
+        'access arguments' => array('administer courses'),
+        'file' => 'courses.admin.inc'
+    );
+
+    $menu['math/courses/terms/%courses_term'] = array(
+        'title' => 'Courses Term',
+        'title callback' => 'courses_term_page_title',
+        'title arguments' => array(3),
+        'page callback' => 'courses_admin_term',
+        'page arguments' => array(3),
+        'access arguments' => array('administer courses'),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );
+    
+    $menu['math/courses/terms/%courses_term/edit'] = array(
+        'title' => 'Edit Term',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('courses_term_form', 3),
+        'access arguments' => array('administer courses'),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );
+    
+    $menu['math/courses/terms/%courses_term/delete'] = array(
+        'title' => 'Delete Term',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('courses_term_delete_form', 3),
+        'access arguments' => array('administer courses'),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );
+    
+    $menu['math/courses/%course'] = array(
+        'title' => 'Course Information',
+        'title callback' => 'course_page_title',
+        'title arguments' => array(2),
+        'page callback' => 'courses_admin_course',
+        'page arguments' => array(2),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc'
+    );
+    
+    $menu['math/courses/%course/info'] = array(
+        'title' => t('Info'),
+        'weight' => -10,
+        'type' => MENU_DEFAULT_LOCAL_TASK
+    );
+    
+    $menu['math/courses/%course/edit'] = array(
+        'title' => t('Edit'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('courses_form', 2, 'edit'),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'weight' => -9,
+        'type' => MENU_LOCAL_TASK
+    );
+    
+    $menu['math/courses/%course/delete'] = array(
+        'title' => t('Delete course'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('courses_delete_form', 2),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );    
+    
+    $menu['math/courses/%course/hours'] = array(
+        'title' => t('Staff Hours'),
+        'page callback' => 'courses_admin_hours',
+        'page arguments' => array(2),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_LOCAL_TASK
+    );
+    
+    $menu['math/courses/%course/hours/delete/%'] = array(
+        'title' => t('Delete staff hour'),
+        'page callback' => 'courses_admin_hours_delete',
+        'page arguments' => array(2, 5),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );    
+    
+    $menu['math/courses/%course/exams'] = array(
+        'title' => t('Exams'),
+        'page callback' => 'courses_admin_exams',
+        'page arguments' => array(2),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_LOCAL_TASK
+    );
+
+    $menu['math/courses/%course/exams/%course_exam/edit'] = array(
+        'title' => t('Edit exam'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('courses_exam_form', 4),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );
+    
+    $menu['math/courses/%course/exams/%course_exam/dist'] = array(
+        'title' => 'Exam distribution',
+        'title callback' => 'course_exam_title',
+        'title arguments' => array(4),
+        'page callback' => 'courses_admin_exam_dist',
+        'page arguments' => array(4),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );
+    
+    $menu['math/courses/%course/exams/%course_exam/dist/ahah'] = array(
+        'page callback' => 'courses_admin_exam_dist_ahah',
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );      
+    
+    $menu['math/courses/%course/exams/%course_exam/delete'] = array(
+        'title' => t('Delete exam'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('courses_exam_delete_form', 4),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_CALLBACK
+    );        
+    
+    $menu['math/courses/%course/content'] = array(
+        'title' => t('Content'),
+        'page callback' => 'courses_admin_content',
+        'page arguments' => array(2),
+        'access callback' => 'courses_access_admin_course',
+        'access arguments' => array(2),
+        'file' => 'courses.admin.inc',
+        'type' => MENU_LOCAL_TASK
+    );    
+    
+    return $menu;
+}
+
+function courses_current_term() {
+    $result = db_query('SELECT term FROM {courses_terms} ORDER BY term DESC LIMIT 1');
+    return db_result($result);
+}
+
+function courses_term_load($term_id) {
+    $result = db_query('SELECT * FROM {courses_terms} WHERE term = \'%s\'', $term_id);
+    $term = db_fetch_object($result);
+    
+    if ($term) {
+        $term->courses = array();
+        
+        $result = db_query('SELECT ci.cid, ci.code, cm.name, cm.level FROM {courses} ci INNER JOIN {courses_meta} cm ON cm.code=ci.code WHERE ci.term=\'%s\' ORDER BY cm.level, cm.name', $term->term);
+        while ($course_instance = db_fetch_object($result)) {
+            $term->courses[$course_instance->level][$course_instance->cid] = $course_instance;
+        }
+        
+    }
+    
+    return $term;
+}
+
+function course_meta_load($code) {
+    $result = db_query('SELECT * FROM {courses_meta} WHERE code = \'%s\'', $code);
+    $course = db_fetch_object($result);
+    
+    if ($course) {
+        $course->instances = array();
+        
+        $result = db_query('SELECT cid, term FROM {courses} WHERE code=\'%s\' ORDER BY term', $course->code);
+        while ($course_instance = db_fetch_object($result)) {
+            $course->instances[$course_instance->cid] = array('cid' => $course_instance->cid,
+                                                              'term' => $course_instance->term);
+        }
+    }
+    
+    return $course;
+}
+
+function course_load($cid) {
+    $result = db_query('SELECT * FROM {courses} WHERE cid = %d', $cid);
+    $course = db_fetch_object($result);
+    
+    if ($course) {
+        // Basic info
+        $result = db_query('SELECT name, level FROM {courses_meta} WHERE code=\'%s\'', $course->code);
+        $course_meta = db_fetch_object($result);
+        $course->name = $course_meta->name;
+        $course->level = $course_meta->level;
+        
+        // Requisites
+        /*$course->prerequisites = array();
+        $result = db_query('SELECT c.cid, c.code, c.name FROM {courses} c INNER JOIN {courses_prereqs} cp ON c.cid = cp.rcid WHERE cp.cid = %d', $course->cid);
+        
+        while ($req = db_fetch_object($result)) {
+            $course->prerequisites[$req->cid] = array('cid' => $req->cid,
+                                                      'code' => $req->code,
+                                                      'name' => $req->name);
+        }*/
+        
+        // Staff
+        $course->staff = array('teachers' => array(),
+                               'teaching assistants' => array());
+        $result = db_query('SELECT u.uid FROM {users} u INNER JOIN {courses_staff} s ON s.uid = u.uid WHERE s.cid = %d ORDER BY u.name', $course->cid);
+        
+        while ($st = db_fetch_object($result)) {
+            $staff_user = user_load($st->uid);
+            
+            foreach (array_keys(gauss_teaching_roles()) as $role) {
+                if (in_array($role, $staff_user->roles)) {
+                    $course->staff[$role . 's'][$staff_user->uid] = array('name' => $staff_user->name,
+                                                                    'uid' => $staff_user->uid);
+                }
+            }
+
+        }
+        
+    }
+    
+    return $course;
+}
+
+function course_exam_load($eid) {
+    $result = db_query('SELECT * FROM {courses_exams} WHERE id=%d', $eid);
+    $exam = db_fetch_object($result);
+    
+    if ($exam) {
+        $exam->is_programmed = FALSE;
+        $exam->distribution = array();
+        $result = db_query('SELECT * FROM {courses_exams_dist} WHERE exam_id=%d ORDER BY id', $eid);
+        
+        while ($ec = db_fetch_object($result)) {
+            $exam->distribution[] = $ec;
+        }
+        
+        if ($exam->distribution ||
+            ($exam->same_time && $exam->same_place)) {
+            $exam->is_programmed = TRUE;
+        }
+    }
+
+    return $exam;
+}
+
+function courses_courses($options = array()) {
+    $ret = array();
+
+    $result = db_query('SELECT * FROM {courses}');
+    while ($c = db_fetch_object($result)) {
+        $ret[] = $c;
+    }
+        
+    return $ret;
+}
+
+function course_page_title($course) {
+    return check_plain($course->code) . ' - ' . check_plain($course->name);
+}
+
+function courses_term_page_title($term) {
+    return $term->term;
+}
+
+function course_exam_title($exam) {
+    $course = course_load($exam->cid);
+    return check_plain($course->name) . ' - ' . check_plain($exam->description);
+}
+
+function courses_exam_page_title($exam) {
+    return check_plain($exam->description);
+}
+
+function courses_perm() {
+    return array('administer courses',
+                 'administer own courses',
+                 'create course content',
+                 'create own course content',
+                 'edit course content',
+                 'edit own course content',
+                 'delete course content',
+                 'delete own course content');
+}
+
+function courses_levels($id = NULL) {
+    $options = array('undergraduate' => t('Undergraduate'),
+                     'graduate' => t('Graduate'));
+    
+    if ($id) {
+        return $options[$id];
+    } else {
+        return $options;
+    }
+
+}
+
+function courses_node_info() {
+    $types = array();
+    
+    $types['problem_set'] = array('name' => t('Problem Set'),
+                                  'module' => 'courses_nodes_pset',
+                                  'description' =>  t('A course problem set. May include solutions.'),
+                                  'has_body' => FALSE,
+                                  'locked' => TRUE);
+    $types['exam'] = array('name' => t('Course Exam'),
+                                  'module' => 'courses_nodes_pset', // Yes, this is intentional
+                                  'description' =>  t('A course exam. May include solutions.'),
+                                  'has_body' => FALSE,
+                                  'locked' => TRUE);
+    $types['class_notes'] = array('name' => t('Class Notes'),
+                                  'module' => 'courses_nodes_notes',
+                                  'description' =>  t('Class notes.'),
+                                  'has_body' => TRUE,
+                                  'min_word_count' => 1,
+                                  'locked' => TRUE);
+    $types['course_news'] = array('name' => t('Course news item'),
+                                  'module' => 'courses_nodes_news',
+                                  'description' => t('Used for course-related announcements.'),
+                                  'has_body' => TRUE,
+                                  'min_word_count' => 1,
+                                  'locked' => TRUE);
+    
+    return $types;
+}
+
+function courses_form_alter(&$form, &$form_state, $form_id) {
+    switch ($form_id) {
+        default:
+            break;
+        case 'class_notes_node_form':
+        case 'course_news_node_form':
+            unset($form['menu']);
+            unset($form['path']);
+            unset($form['revision_information']);            
+            break;
+        case 'problem_set_node_form':
+        case 'exam_node_form':
+            unset($form['attachments']);
+            unset($form['menu']);
+            unset($form['path']);
+            unset($form['revision_information']);
+            break;
+    }
+}
+
+/* Class notes */
+function courses_nodes_notes_load($node) {
+    if ($node->vid) {
+        $result = db_query('SELECT cid FROM {courses_nodes} WHERE vid = %d', $node->vid);
+        if ($cnode = db_fetch_object($result)) {
+            return array('cid' => $cnode->cid); 
+        }
+    }
+    
+    return array();
+}
+
+function courses_nodes_notes_access($op, $node, $account) {
+    return courses_nodes_access($op, $node, $account);
+}
+
+function courses_nodes_notes_form(&$node) {
+    global $user;
+    
+    $form = array();
+    $type = node_get_types('type', $node);
+    
+    if ($type->has_title) {
+        $form['title'] = array(
+            '#type' => 'textfield',
+            '#title' => check_plain($type->title_label),
+            '#required' => TRUE,
+            '#default_value' => $node->title,
+            '#weight' => -5
+        );
+    }
+      
+    if ($type->has_body) {
+        $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+    }
+    
+    $course_options = array();
+    
+    if (isset($_GET['cid'])) {
+        if ($course = course_load($_GET['cid'])) {
+            $course_options[$course->cid] = $course->code . ' - ' . check_plain($course->name);
+        } else {
+            drupal_access_denied();
+            exit;
+        }
+    } else {    
+        $result = db_query('SELECT ci.cid, ci.code, ci.term, cm.name FROM {courses} ci INNER JOIN {courses_meta} cm ON cm.code = ci.code ORDER BY ci.term, cm.name DESC');
+        while ($course = db_fetch_object($result)) {
+            $course_options[$course->term][$course->cid] = $course->code . ' - ' . check_plain($course->name);
+        }
+    }
+    // Filter course list
+    if ( (!$node->nid && !user_access('create course content')) ||
+         ($node->nid && !user_access('edit course content')) ) {
+             foreach ($course_options as $term => $course_arr) {
+                 foreach (array_keys($course_arr) as $cid) {
+                     if (db_result(db_query('SELECT COUNT(*) FROM {courses_staff} WHERE uid = %d AND cid = %d', $user->uid, $cid)) == 0) {
+                         unset($course_options[$term][$cid]);
+                     }
+                 }
+             }
+    }
+    
+    
+    $form['cid'] = array(
+        '#type' => 'select',
+        '#title' => t('Course'),
+        '#options' => $course_options,
+        '#weight' => -10,
+        '#required' => TRUE,
+        '#default_value' => isset($node->cid) ? $node->cid : '');
+    
+    return $form;
+}
+
+function courses_nodes_notes_insert($node) {
+    db_query('INSERT INTO {courses_nodes} (vid, nid, cid) VALUES (%d, %d, %d)', $node->vid, $node->nid, $node->cid);
+}
+
+function courses_nodes_notes_update($node) {
+    if ($node->revision) {
+        courses_nodes_notes_insert($node);
+    }
+    
+    db_query('UPDATE {courses_nodes} SET cid=%d WHERE vid = %d', $node->cid, $node->vid);
+}
+
+function courses_nodes_notes_delete($node) {
+    db_query('DELETE FROM {courses_nodes} WHERE nid = %d', $node->nid);
+}
+
+function courses_nodes_notes_view($node, $teaser = FALSE, $page = FALSE) {
+    $node = node_prepare($node, $teaser);
+    
+    if ($page) {
+        $course = course_load($node->cid);
+        courses_set_breadcrumb($course, array(array('Notas de clase',
+                                                'cur/' . $course->term . '/' . $course->code . '/notas')));
+    }
+    
+    return $node;
+}
+
+/* Course News */
+function courses_nodes_news_load($node) {
+    return courses_nodes_notes_load($node);
+}
+
+function courses_nodes_news_access($op, $node, $account) {
+    return courses_nodes_access($op, $node, $account);
+}
+
+function courses_nodes_news_form(&$node) {
+    return courses_nodes_notes_form($node);
+}
+
+function courses_nodes_news_insert($node) {
+    courses_nodes_notes_insert($node);
+}
+
+function courses_nodes_news_update($node) {
+    courses_nodes_notes_update($node);
+}
+
+function courses_nodes_news_delete($node) {
+    courses_nodes_notes_delete($node);
+}
+
+function courses_nodes_news_view($node, $teaser = FALSE, $page = FALSE) {
+    $node = node_prepare($node, $teaser);
+    
+    if ($page) {
+        $course = course_load($node->cid);
+        courses_set_breadcrumb($course);
+    }
+    
+    return $node;
+}
+
+/* Exams & Problem sets */
+function courses_nodes_pset_load($node) {
+    $additions = array();
+    
+    if ($node->vid) {
+        $result = db_query('SELECT cid FROM {courses_nodes} WHERE vid = %d', $node->vid);
+        if ($cnode = db_fetch_object($result)) {
+            $additions['cid'] = $cnode->cid;
+        }        
+        
+        
+        $result = db_query('SELECT * FROM {files} f INNER JOIN {courses_nodes_files} cn ON f.fid = cn.fid WHERE cn.vid = %d', $node->vid);
+
+        while ($file = db_fetch_object($result)) {
+            if ($file->tag == 'problem_set_file') {
+                $additions['problem_set_file'] = $file;
+            } else if ($file->tag == 'exam_file') {
+                $additions['exam_file'] = $file;
+            } else {
+                $additions['solution_file'] = $file;
+            }
+        }
+
+    }
+    
+    return $additions;
+}
+
+function courses_nodes_pset_access($op, $node, $account) {
+    return courses_nodes_access($op, $node, $account);
+}
+
+
+function courses_nodes_pset_form(&$node) {
+    global $user;
+    
+    $form = array();
+    $type = node_get_types('type', $node);
+    
+    if ($type->has_title) {
+        $form['title'] = array(
+            '#type' => 'textfield',
+            '#title' => check_plain($type->title_label),
+            '#required' => TRUE,
+            '#default_value' => $node->title,
+            '#weight' => -5
+        );
+    }
+      
+    if ($type->has_body) {
+        $form['body_field'] = node_body_field($node, $type->body_label, $type->min_word_count);
+    }
+    
+    $course_options = array();
+    
+    if (isset($_GET['cid'])) {
+        if ($course = course_load($_GET['cid'])) {
+            $course_options[$course->cid] = $course->code . ' - ' . check_plain($course->name);
+        } else {
+            drupal_access_denied();
+            exit;
+        }
+    } else {    
+        $result = db_query('SELECT ci.cid, ci.code, ci.term, cm.name FROM {courses} ci INNER JOIN {courses_meta} cm ON cm.code = ci.code ORDER BY ci.term, cm.name DESC');
+        while ($course = db_fetch_object($result)) {
+            $course_options[$course->term][$course->cid] = $course->code . ' - ' . check_plain($course->name);
+        }
+    }
+    // Filter course list
+    if ( (!$node->nid && !user_access('create course content')) ||
+         ($node->nid && !user_access('edit course content')) ) {
+             foreach ($course_options as $term => $course_arr) {
+                 foreach (array_keys($course_arr) as $cid) {
+                     if (db_result(db_query('SELECT COUNT(*) FROM {courses_staff} WHERE uid = %d AND cid = %d', $user->uid, $cid)) == 0) {
+                         unset($course_options[$term][$cid]);
+                     }
+                 }
+             }
+    }    
+    
+    $form['cid'] = array(
+        '#type' => 'select',
+        '#title' => t('Course'),
+        '#options' => $course_options,
+        '#weight' => -10,
+        '#required' => TRUE,
+        '#default_value' => isset($node->cid) ? $node->cid : '');
+    
+    $path = file_directory_path() . '/courses';
+    
+    if (!file_check_directory($path, FILE_CREATE_DIRECTORY)) {
+        $form['problem_set_file'] = array('#value' => '<b>File uploads are disabled.</b>');
+    } else {
+        if ($node->type == 'exam') {
+            if (isset($node->exam_file)) {
+                $form['exam_file'] = array(
+                    '#value' => '<b>' . t('Exam file') . '</b>: ' . check_plain($node->exam_file->filename) . '<br />',
+                    '#weight' => -4
+                );
+            } else {
+                $form['exam_file'] = array(
+                    '#type' => 'file',
+                    '#title' => t('Exam file') . ' *',
+                    '#weight' => -4);                
+            }
+            
+            if (isset($node->solution_file)) {
+                $form['solution_file'] = array(
+                    '#value' => '<b>' . t('Solution file') . '</b>: ' . check_plain($node->solution_file->filename) . '<br />',
+                    '#weight' => -4
+                );            
+            } else {
+                $form['solution_file'] = array(
+                    '#type' => 'file',
+                    '#title' => t('Solution file'),
+                    '#weight' => -4);
+            }                
+            
+        } else if ($node->type == 'problem_set') {
+
+            if (isset($node->problem_set_file)) {
+                $form['problem_set_file'] = array(
+                    '#value' => '<b>' . t('Problem Set file') . '</b>: ' . check_plain($node->problem_set_file->filename) . '<br />',
+                    '#weight' => -4
+                );
+            } else {
+                $form['problem_set_file'] = array(
+                    '#type' => 'file',
+                    '#title' => t('Problem Set file') . ' *',
+                    '#weight' => -4);
+            }
+            
+            if (isset($node->solution_file)) {
+                $form['problem_set_solution_file'] = array(
+                    '#value' => '<b>' . t('Solution file') . '</b>: ' . check_plain($node->solution_file->filename) . '<br />',
+                    '#weight' => -4
+                );            
+            } else {
+                $form['problem_set_solution_file'] = array(
+                    '#type' => 'file',
+                    '#title' => t('Solution file'),
+                    '#weight' => -4);
+            }            
+
+        }
+
+    }    
+    
+    return $form;
+}
+
+function courses_nodes_pset_validate($node, &$form) {
+    if ($node->delete !== $node->op && (!$node->vid)) {
+        
+        if ($node->type == 'problem_set' && !is_uploaded_file($_FILES['files']['tmp_name']['problem_set_file'])) {
+            form_set_error('problem_set_file', t('A problem set file is required.'));
+        } else if ($node->type == 'exam' && !is_uploaded_file($_FILES['files']['tmp_name']['exam_file'])) {
+            form_set_error('exam_file', t('An exam file is required.'));
+        }        
+
+    }
+}
+
+function courses_nodes_pset_insert($node) {
+    $validators = array();
+    
+    db_query('INSERT INTO {courses_nodes} (nid, vid, cid) VALUES(%d, %d, %d)',
+             $node->nid, $node->vid, $node->cid);
+    
+    switch ($node->type) {
+        case 'exam':
+            if ($file = file_save_upload('exam_file', $validators, file_directory_path() . '/courses')) {
+                db_query('INSERT INTO {courses_nodes_files} (vid, nid, fid, cid, tag) VALUES (%d, %d, %d, %d, \'%s\')',
+                         $node->vid, $node->nid, $file->fid, $node->cid, 'exam_file');
+                file_set_status($file, FILE_STATUS_PERMANENT);
+            }
+            
+            if (is_uploaded_file($_FILES['files']['tmp_name']['solution_file'])) {
+                if ($file = file_save_upload('solution_file', $validators, file_directory_path() . '/courses')) {
+                    db_query('INSERT INTO {courses_nodes_files} (vid, nid, fid, cid) VALUES (%d, %d, %d, %d)',
+                             $node->vid, $node->nid, $file->fid, $node->cid);
+                    file_set_status($file, FILE_STATUS_PERMANENT);
+                }
+            }            
+            
+            break;
+        case 'problem_set':
+            
+            if ($file = file_save_upload('problem_set_file', $validators, file_directory_path() . '/courses')) {
+                db_query('INSERT INTO {courses_nodes_files} (vid, nid, fid, cid, tag) VALUES (%d, %d, %d, %d, \'%s\')',
+                         $node->vid, $node->nid, $file->fid, $node->cid, 'problem_set_file');
+                file_set_status($file, FILE_STATUS_PERMANENT);
+            }
+            
+            if (is_uploaded_file($_FILES['files']['tmp_name']['problem_set_solution_file'])) {
+                if ($file = file_save_upload('problem_set_solution_file', $validators, file_directory_path() . '/courses')) {
+                    db_query('INSERT INTO {courses_nodes_files} (vid, nid, fid, cid) VALUES (%d, %d, %d, %d)',
+                             $node->vid, $node->nid, $file->fid, $node->cid);
+                    file_set_status($file, FILE_STATUS_PERMANENT);
+                }
+            }
+            
+            break;
+    }
+    
+}
+
+function courses_nodes_pset_update($node) {
+    if ($node->revision) {
+        courses_nodes_pset_insert($node);
+    }
+    
+    db_query('UPDATE {courses_nodes} SET cid=%d WHERE vid = %d', $node->cid, $node->vid);
+    
+    
+    if ($node->type == 'problem_set' && is_uploaded_file($_FILES['files']['tmp_name']['problem_set_solution_file'])) {
+        if ($file = file_save_upload('problem_set_solution_file', array(), file_directory_path() . '/courses')) {
+            db_query('INSERT INTO {courses_nodes_files} (vid, nid, fid, cid) VALUES (%d, %d, %d, %d)',
+                     $node->vid, $node->nid, $file->fid, $node->cid);
+            file_set_status($file, FILE_STATUS_PERMANENT);
+        }
+    } else if ($node->type == 'exam' && is_uploaded_file($_FILES['files']['tmp_name']['solution_file'])) {
+        if ($file = file_save_upload('solution_file', array(), file_directory_path() . '/courses')) {
+            db_query('INSERT INTO {courses_nodes_files} (vid, nid, fid, cid) VALUES (%d, %d, %d, %d)',
+                     $node->vid, $node->nid, $file->fid, $node->cid);
+            file_set_status($file, FILE_STATUS_PERMANENT);
+        }
+    }    
+
+}
+
+function courses_nodes_pset_delete($node) {
+    $files = array();
+    
+    $result = db_query('SELECT DISTINCT f.* FROM {courses_nodes_files} cn INNER JOIN {files} f ON cn.fid = f.fid WHERE cn.nid = %d', $node->nid);
+    while ($file = db_fetch_object($result)) {
+        $files[$file->fid] = $file;
+    }
+    
+    foreach ($files as $fid => $file) {
+        db_query('DELETE FROM {files} WHERE fid = %d', $fid);
+        file_delete($file->filepath);
+    }
+
+    db_query('DELETE FROM {courses_nodes_files} WHERE nid = %d', $node->nid);
+    db_query('DELETE FROM {courses_nodes} WHERE nid = %d', $node->nid);
+
+}
+
+function courses_nodes_pset_view($node, $teaser = FALSE, $page = FALSE) {
+    $node = node_prepare($node, $teaser);
+    
+    $files = array();
+    if ($node->type == 'exam') {
+        $files[] = $node->exam_file;
+    } else if ($node->type == 'problem_set') {
+        $files[] = $node->problem_set_file;
+    }
+    
+    if (isset($node->solution_file))
+        $files[] = $node->solution_file;
+    
+    $node->content['files'] = array(
+        '#value' => theme('node_pset_exam_files', $files),
+        '#weight' => 1,
+    );
+
+    return $node;
+}
+
+function _node_pset_exam_format_file($file) {
+    $href = file_create_url($file->filepath);
+    return l($file->filename, $href) . ' (' . format_size($file->filesize) . ')';
+}
+
+function theme_node_pset_exam_files($files) {
+    $output = '';
+
+    $output = '<dl>';
+    foreach ($files as $file) {
+        if ($file->tag == 'problem_set_file') {
+            $output .= '<dt>' . t('Problem Set') . '</dt>';
+            $output .= '<dd>' . _node_pset_exam_format_file($file) . '</dd>';
+        } else if ($file->tag == 'exam_file') {
+            $output .= '<dt>' . t('Exam') . '</dt>';
+            $output .= '<dd>' . _node_pset_exam_format_file($file) . '</dd>';            
+        } else {
+            $output .= '<dt>' . t('Solution') . '</dt>';
+            $output .= '<dd>' . _node_pset_exam_format_file($file) . '</dd>';            
+        }
+    }
+    $output .= '</dl>';
+
+    return $output;
+}
+
+function courses_theme() {
+    return array(
+        'node_pset_exam_files' => array(
+            'arguments' => array('files')
+        )
+    );
+}
+
+/* Courses block */
+function courses_block($op = 'list', $delta = '', $edit = array()) {
+    switch ($op) {
+        case 'list':
+            $blocks = array();
+            $blocks['course-nav'] = array(
+                'info' => t('Course navigation'),
+                'cache' => BLOCK_NO_CACHE,
+                'weight' => -10,
+                'region' => 'left',
+                'visibility' => 1,
+                'status' => TRUE
+            );
+            $blocks['term-courses'] = array(
+                'info' => t('Current term courses administration'),
+                'weight' => -10,
+                'region' => 'floating_sidebar',
+                'visibility' => 0,
+                'status' => FALSE
+            );
+            
+            return $blocks;
+
+            break;
+        case 'view':
+            switch ($delta) {
+                case 'course-nav':
+                    return array('subject' => t('Course block'),
+                                 'content' => courses_course_nav_block());
+                    break;
+                case 'term-courses':
+                    $term = courses_current_term();
+                    return array('subject' => t('!term Courses admin', array('!term' => $term)),
+                                 'content' => courses_term_courses_block());
+            }
+        
+            break;
+    }
+}
+
+function courses_course_nav_block() {
+    $show_block = FALSE;
+    $course = NULL;
+    
+    // For node-types related to a course
+    if (arg(0) == 'node' && is_numeric(arg(1))) {
+        $nid = arg(1);
+        $node = node_load(array('nid' => $nid));
+        
+        if (in_array($node->type, array_keys(courses_node_info()))) {
+            $show_block = TRUE;
+        }
+    }
+    
+    if (!$show_block) {
+        if (arg(0) == 'cur' && arg(1) != 'undergraduate' && arg(1) != 'graduate' &&
+            arg(2) != 'undergraduate' && arg(2) != 'graduate') {
+            $term_id = arg(1);
+            $course_code = arg(2);
+            
+            $result = db_query('SELECT 1 FROM {courses} WHERE term=\'%s\' AND code=\'%s\'',
+                                $term_id, $course_code);
+            if (db_result($result))
+                $show_block = TRUE;
+        }
+    }
+    
+    if ($show_block)
+        return menu_tree('courses');
+    else    
+        return;
+}
+
+function courses_term_courses_block() {
+    global $user;
+    
+    $courses = array();
+    $term = courses_term_load(courses_current_term());
+    
+    if ($term) {
+      
+        if (in_array('staff', $user->roles) || in_array('admin', $user->roles)) {
+            foreach ($term->courses as $level => $level_courses) {
+                foreach ($level_courses as $course_info) {
+                    $courses[] = l($course_info->code . ' - ' . $course_info->name,
+                                   'math/courses/' . $course_info->cid);
+                }
+            }
+        } else if (in_array('teacher', $user->roles)) {
+            foreach ($term->courses as $level => $level_courses) {
+                foreach ($level_courses as $course_info) {
+                    if (db_result(db_query('SELECT COUNT(*) FROM {courses_staff} WHERE cid=%d AND uid=%d',
+                                       $course_info->cid, $user->uid)) > 0) {
+                        $courses[] = l($course_info->code . ' - ' . $course_info->name,
+                                       'math/courses/' . $course_info->cid);
+                    }
+                }
+            }
+        }
+    }
+        
+    if ($courses) {
+        $output = '<ul>';
+        
+        foreach ($courses as $l) {
+            $output .= '<li>' . $l . '</li>';
+        }
+        
+        $output .= '</ul>';
+        
+        return $output;
+    }
+    
+    return;
+}
+
+function courses_set_breadcrumb($course, $extra = array(), $set_trail = FALSE) {
+    $items = array();
+    $items[] = array(t('Home'), '<front>');
+    $items[] = array(t('Courses'), 'cur');
+    $items[] = array($course->term, 'cur/' . $course->term);
+    $items[] = array($course->code . ' - ' . check_plain($course->name),
+                     'cur/' . $course->term . '/' . $course->code);
+    
+    foreach ($extra as $e) $items[] = $e;
+    
+    // Breadcrumb
+    $breadcrumb = array();
+    foreach ($items as $item)
+        $breadcrumb[] = l($item[0], $item[1]);
+    drupal_set_breadcrumb($breadcrumb);
+    
+    /*if ($set_trail) {
+        $trail = array();
+        $trail[] = array('title' => t('Home'),
+                         'href' => '<front>',
+                         'localized_options' => array(), 'type' => 0);
+        $trail[] = array('title' => t('Courses'),
+                         'href' => 'cur',
+                         'localized_options' => array(), 'type' => 0);        
+        
+        for ($i = 2; $i < count($items); $i++) {
+            $item = $items[$i];
+            $trail[] = menu_get_item($item[1]);
+        }
+        
+        menu_set_active_trail($trail);
+    }*/
+
+}
+
+function courses_access_admin_course($course, $account = NULL) {
+    global $user;
+    
+    if (!isset($account))
+        $account = $user;
+        
+    if (user_access('administer courses'))
+        return TRUE;
+        
+    if (user_access('administer own courses')) {
+        return in_array($account->uid, array_keys($course->staff['teachers'])) ||
+               in_array($account->uid, array_keys($course->staff['teaching assistants']));
+    }
+        
+    return FALSE;
+}
+
+function courses_nodes_access($op, $node, $account) {
+    $course = course_load($node->cid);
+    
+    switch ($op) {
+        case 'view':
+            return user_access('access content', $account);
+        case 'create':
+            return user_access('create course content') ||
+                   user_access('create own course content');
+        case 'delete':
+            return user_access('delete course content') ||
+                   (user_access('delete own course content') && 
+                        (in_array($account->uid, array_keys($course->staff['teachers'])) ||
+                         in_array($account->uid, array_keys($course->staff['teaching assistants'])))
+                   );
+        case 'update':
+            return user_access('edit course content') ||
+                   (user_access('edit own course content') && 
+                        (in_array($account->uid, array_keys($course->staff['teachers'])) ||
+                         in_array($account->uid, array_keys($course->staff['teaching assistants'])))
+                   );
+    }
+    
+    return TRUE;
+}

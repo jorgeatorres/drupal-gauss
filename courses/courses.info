@@ -1,0 +1,6 @@
+name = Courses
+package = Escuela de matemáticas
+version = 0.1
+core = 6.x
+dependencies[] = gauss
+dependencies[] = date_api

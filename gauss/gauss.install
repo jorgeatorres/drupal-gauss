@@ -1,0 +1,58 @@
+<?php
+function gauss_schema() {
+
+    $schema['user_profile'] = array(
+        'description' => t('Table for extending user info.'),
+        'fields' => array(
+            'uid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'name' => array('type' => 'varchar',
+                            'length' => 255,
+                            'not null' => TRUE),
+            'title' => array('type' => 'varchar',
+                             'length' => 255,
+                             'default' => NULL),
+            'office' => array('type' => 'varchar',
+                              'length' => 20,
+                              'default' => NULL),
+            'extension' => array('type' => 'varchar',
+                                 'length' => 20,
+                                 'default' => NULL),
+            'interests' => array('type' => 'text'),
+            'bio' => array('type' => 'text'),
+            'links' => array('type' => 'text')
+        ),
+        'unique keys' => array(
+            'uid' => array('uid')
+        ),
+        'primary key' => array('uid')
+    );
+    
+    return $schema;
+}
+
+function gauss_install() {
+    drupal_install_schema('gauss');
+    
+    db_query("INSERT INTO {role} (name) VALUES('%s')", 'administrator');
+    db_query("INSERT INTO {role} (name) VALUES('%s')", 'teacher');
+    db_query("INSERT INTO {role} (name) VALUES('%s')", 'teaching assistant');    
+    db_query("INSERT INTO {role} (name) VALUES('%s')", 'staff');
+}
+
+function gauss_uninstall() {
+    $roles = array('administrator', 'teacher', 'teaching assistant', 'staff');
+    
+    foreach ($roles as $role) {
+        $rid = db_result(db_query('SELECT rid FROM {role} WHERE name=\'%s\'', $role));
+        db_query('DELETE FROM {users_roles} WHERE rid = %d', $rid);
+        db_query('DELETE FROM {role} WHERE rid = %d', $rid);
+    }
+    
+    db_query('DELETE FROM {menu_links} WHERE module = \'gauss\'');
+    menu_cache_clear_all();
+
+    drupal_uninstall_schema('gauss');
+}
+

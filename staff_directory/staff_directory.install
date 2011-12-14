@@ -1,0 +1,53 @@
+<?php
+function staff_directory_schema() {
+
+    $schema['directory_category'] = array(
+        'description' => t(''),
+        'fields' => array(
+            'cid' => array('type' => 'serial',
+                          'unsigned' => TRUE,
+                          'not null' => TRUE),
+            'name' => array('type' => 'varchar',
+                            'length' => 255,
+                            'not null' => TRUE)
+        ),
+        'unique keys' => array(
+            'cid' => array('cid'),
+            'name' => array('name')
+        ),
+        'primary key' => array('cid')
+    );
+    
+    $schema['directory_entry'] = array(
+        'description' => t(''),
+        'fields' => array(
+            'uid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'cid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'occupation' => array('type' => 'varchar',
+                                  'length' => 255,
+                                  'not null' => TRUE)
+        ),
+        'unique keys' => array(
+            'uid_cid' => array('uid', 'cid')
+        ),
+        'primary key' => array('uid', 'cid')
+    );
+
+    return $schema;
+}
+
+function staff_directory_install() {
+    drupal_install_schema('staff_directory');
+}
+
+function staff_directory_uninstall() {
+    drupal_uninstall_schema('staff_directory');
+    
+    db_query('DELETE FROM {menu_links} WHERE module = \'staff_directory\'');
+    menu_cache_clear_all();
+}
+

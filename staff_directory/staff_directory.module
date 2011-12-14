@@ -1,0 +1,275 @@
+<?php
+function staff_directory_menu() {
+
+    $menu['dir'] = array(
+        'title' => 'Staff directory',
+        'page callback' => 'staff_directory_list',
+        'access arguments' => array('access content'),
+        'type' => MENU_SUGGESTED_ITEM,
+        'menu_name' => 'primary-links'
+    );
+
+    $menu['math/directory'] = array(
+        'title' => 'Staff directory',
+        'page callback' => 'staff_directory_admin_directory_list',
+        'access arguments' => array('administer staff directory')
+    );
+    $menu['math/directory/list'] = array(
+        'title' => 'Directory',
+        'page callback' => 'staff_directory_admin_directory_list',
+        'access arguments' => array('administer staff directory'),
+        'type' => MENU_DEFAULT_LOCAL_TASK,
+        'weight' => -10,
+    );
+    
+    $menu['math/directory/delete'] = array(
+        'title' => 'Delete directory entry',
+        'page callback' => 'staff_directory_confirm_delete',
+        'access arguments' => array('administer staff directory'),
+        'type' => MENU_CALLBACK
+    );    
+    $menu['math/directory/categories'] = array(
+        'title' => 'Categories',
+        'page callback' => 'staff_directory_admin_directory_categories',
+        'access arguments' => array('administer staff directory'),
+        'type' => MENU_LOCAL_TASK
+    );
+    $menu['math/directory/categories/delete'] = array(
+        'title' => 'Delete directory category',
+        'page callback' => 'staff_directory_admin_directory_category_delete',
+        'access arguments' => array('administer staff directory'),
+        'type' => MENU_CALLBACK
+    );
+    $menu['math/directory/occupation_autocomplete'] = array(
+        'title' => 'Occupation autocomplete',
+        'page callback' => 'staff_directory_occupation_autocomplete',
+        'access arguments' => array('administer staff directory'),
+        'type' => MENU_CALLBACK
+    );
+
+    return $menu;
+}
+
+function staff_directory_list($cid = NULL) {
+    $output = '';
+    
+    $cid = !$cid ? db_result(db_query('SELECT cid FROM {directory_category} ORDER BY name LIMIT 1')) : $cid;
+    
+    $categories = array();
+    $categories_res = db_query('SELECT cid, name FROM {directory_category} ORDER BY name');
+    while ($category = db_fetch_object($categories_res)) {
+        $categories[$category->cid] = $category->name;
+    }
+    
+    if (db_result(db_query('SELECT COUNT(*) FROM {directory_category} WHERE cid = %d', $cid)) == 0) {
+        return drupal_not_found();
+    }
+
+    $header = array(t('Name'), t('Title'), t('Office'), t('Extension'), t('Email'));
+    $rows = array();
+    $result = db_query('SELECT e.uid, e.occupation FROM {directory_entry} e LEFT JOIN {user_profile} u ON u.uid = e.uid WHERE e.cid = %d ORDER BY u.name', $cid); 
+    while ($entry = db_fetch_object($result)) {
+        $user = user_load(array('uid' => $entry->uid));
+        $rows[] = array($user->profile->name,
+                        $entry->occupation,
+                        $user->profile->office,
+                        $user->profile->extension ? $user->profile->extension : '--',
+                        l($user->mail, 'mailto:' . $user->mail));
+    }
+    if (!$rows) $rows[] = array(array('data' => t('No entries found.'), 'colspan' => 5));
+    
+    $results_table = theme('table', $header, $rows);
+    
+    ob_start();
+    include_once drupal_get_path('module', 'staff_directory') . '/directory.tpl.php';
+    $output .= ob_get_contents();
+    ob_end_clean();    
+
+    return $output;
+}
+
+// TODO - Add filtering options
+function staff_directory_admin_directory_list() {
+    $output = '';
+    
+    $header = array(t('Name'), t('Category'), t('Occupation'), t('Contact Info'), t('Operations'));
+    $rows = array();
+    
+    // TODO - use a JOIN!
+    $res = db_query('SELECT uid, cid, occupation FROM {directory_entry} ORDER BY cid');
+    while ($entry = db_fetch_object($res)) {
+        $user = user_load($entry->uid);
+        $category = db_result(db_query('SELECT name FROM {directory_category} WHERE cid=%d', $entry->cid));
+        $rows[] = array($user->profile->name, $category,
+                        $entry->occupation,
+                        $user->profile->office . ' / ' . $user->profile->extension,
+                        l(t('edit profile'), 'user/' . $user->uid . '/edit', array('query' => array('destination' => 'math/directory'))) . ' ' .
+                        l(t('delete'), 'math/directory/delete/' . $entry->uid . '/' . $entry->cid)
+                        );
+    }
+    if (!$rows) $rows[] = array(array('data' => t('No entries found.'), 'colspan' => 5));
+   
+    $output .= theme('table', $header, $rows);
+    $output .= drupal_get_form('staff_directory_add_entry_form');
+
+    return $output;
+}
+
+function staff_directory_confirm_delete($uid, $cid) {
+    return drupal_get_form('staff_directory_confirm_delete_form', $uid, $cid);
+}
+
+function staff_directory_confirm_delete_form(&$form_state, $uid, $cid) {
+    $form['uid'] = array('#type' => 'value', '#value' => $uid);
+    $form['cid'] = array('#type' => 'value', '#value' => $cid);
+
+    return confirm_form($form,
+                        t('Are you sure you want to delete this directory entry?'),
+                        'math/directory', NULL, t('Delete'), t('Cancel'));
+}
+
+function staff_directory_confirm_delete_form_submit($form, &$form_state) {
+    if ($form_state['values']['uid'] > 0 && $form_state['values']['cid'] > 0) {
+        db_query('DELETE FROM {directory_entry} WHERE uid = %d AND cid = %d',
+                 $form_state['values']['uid'],
+                 $form_state['values']['cid']);
+        drupal_set_message(t('The entry has been deleted from the directory.'));
+    }
+    $form_state['redirect'] = 'math/directory';
+}
+
+function staff_directory_add_entry_form() {
+    $user_opts = array();
+    $res = db_query('SELECT uid, name FROM {users} WHERE uid > 0');
+    while ($obj = db_fetch_object($res)) {
+        $user = user_load($obj->uid);
+        $user_opts[$user->uid] = $user->profile->name;
+    }
+    
+    $category_opts = array();
+    $res = db_query('SELECT cid, name FROM {directory_category} ORDER BY name');
+    while ($obj = db_fetch_object($res)) {
+        $category_opts[$obj->cid] = $obj->name;
+    }
+    
+    $form = array();
+    $form['entry'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Add entry'),
+        '#collapsible' => TRUE
+    );
+    $form['entry']['uid'] = array(
+        '#type' => 'select',
+        '#title' => t('User'),
+        '#options' => $user_opts,
+        '#multiple' => FALSE,
+        '#required' => TRUE);
+    $form['entry']['cid'] = array(
+        '#type' => 'select',
+        '#title' => t('Category'),
+        '#options' => $category_opts,
+        '#multiple' => FALSE,
+        '#required' => TRUE
+    );
+    $form['entry']['occupation'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Occupation'),
+        '#autocomplete_path' => 'math/directory/occupation_autocomplete',
+        '#maxlength' => 255,
+        '#size' => 30,
+        '#required' => TRUE);
+    $form['entry']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Save')
+    );
+
+    return $form;
+}
+
+function staff_directory_occupation_autocomplete($string) {
+    $matches = array();
+    
+    $result = db_query_range("SELECT occupation FROM {directory_entry} WHERE LOWER(occupation) LIKE LOWER('%s%%')", $string, 0, 10);
+    while ($data = db_fetch_object($result)) {
+        $matches[$data->occupation] = check_plain($data->occupation);
+    }
+    
+    drupal_json($matches);
+}
+
+function staff_directory_add_entry_form_validate($form, &$form_state) {
+    // Check for duplicates
+    if (db_result(db_query('SELECT COUNT(*) FROM {directory_entry} WHERE uid = %d AND cid = %d', $form_state['values']['uid'],
+                           $form_state['values']['cid'])) > 0) {
+        form_set_error('', t('The selected user has already been asigned this category in the directory.'));
+    }
+}
+
+function staff_directory_add_entry_form_submit($form, &$form_state) {
+    db_query('INSERT INTO {directory_entry} (uid, cid, occupation) VALUES(%d, %d, \'%s\')', $form_state['values']['uid'], $form_state['values']['cid'], $form_state['values']['occupation']);
+    drupal_set_message(t('The user has been added to the selected category in the directory.'));
+}
+
+// TODO - Edit category name
+// TODO - Drag & Drop for ordering
+function staff_directory_admin_directory_categories() {
+    $output = '';
+
+    $t_header = array(
+        array('data' => t('Name'), 'field' => 'name', 'sort' => 'asc'),
+        t('Operations')
+    );
+    $t_rows = array();
+
+    $query = db_query('SELECT cid, name FROM {directory_category}' . tablesort_sql($t_header));
+
+    while ($rs = db_fetch_object($query)) {
+        $t_rows[] = array($rs->name, l(t('delete'), 'math/directory/categories/delete/' . $rs->cid));
+    }
+
+    if (count($t_rows) == 0) $t_rows[] = array(array('data' => t('No entries found.'), 'colspan' => 2));
+
+    $output = theme('table', $t_header, $t_rows);
+
+    $output .= drupal_get_form('staff_directory_directory_category_add_form');
+
+    return $output;
+}
+
+// TODO - Implement a confirmation form (confirm_form)
+function staff_directory_admin_directory_category_delete($cid) {
+    db_query('DELETE FROM {directory_category} WHERE cid=%d', $cid);
+    db_query('DELETE FROM {directory_entry} WHERE cid=%d', $cid);
+    drupal_set_message(t('The directory category has been deleted.'));
+    drupal_goto('math/directory/categories');
+}
+
+function staff_directory_directory_category_add_form() {
+    $form = array();
+    $form['category_add_fs'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('New Category'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE
+    );
+    $form['category_add_fs']['name'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Name'),
+        '#required' => TRUE,
+    );
+    $form['category_add_fs']['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add category')
+    );
+
+    return $form;
+}
+
+function staff_directory_directory_category_add_form_submit($form, &$form_state) {
+    db_query("INSERT INTO {directory_category} (name) VALUES('%s')", $form_state['values']['name']);
+}
+
+function staff_directory_perm() {
+    return array('administer staff directory');
+}
+

@@ -1,0 +1,98 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  gauss.module: n/a
+#  gauss.install: n/a
+#  gauss.info: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2010-05-02 19:28-0500\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: gauss.module:47;56
+msgid "Name"
+msgstr ""
+
+#: gauss.module:82
+msgid "University Profile"
+msgstr ""
+
+#: gauss.module:84
+msgid "Title"
+msgstr ""
+
+#: gauss.module:89
+msgid "Office"
+msgstr ""
+
+#: gauss.module:94
+msgid "Tel. Extension"
+msgstr ""
+
+#: gauss.module:99
+msgid "Interests"
+msgstr ""
+
+#: gauss.module:103
+msgid "Bio"
+msgstr ""
+
+#: gauss.module:118
+msgid "Monday"
+msgstr ""
+
+#: gauss.module:119
+msgid "Tuesday"
+msgstr ""
+
+#: gauss.module:120
+msgid "Wednesday"
+msgstr ""
+
+#: gauss.module:121
+msgid "Thursday"
+msgstr ""
+
+#: gauss.module:122
+msgid "Friday"
+msgstr ""
+
+#: gauss.module:123
+msgid "Saturday"
+msgstr ""
+
+#: gauss.module:124
+msgid "Sunday"
+msgstr ""
+
+#: gauss.module:17
+msgid "administer gauss"
+msgstr ""
+
+#: gauss.module:4
+msgid "Math Department Admin"
+msgstr ""
+
+#: gauss.install:5
+msgid "Table for extending user info."
+msgstr ""
+
+#: gauss.info:0
+msgid "Gauss"
+msgstr ""
+
+#: gauss.info:0
+msgid "Escuela de matemáticas"
+msgstr ""
+

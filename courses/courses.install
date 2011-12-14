@@ -1,0 +1,248 @@
+<?php
+function courses_schema() {
+    $schema = array();
+    
+    $schema['courses_terms'] = array(
+        'fields' => array(
+            'term' => array('type' => 'varchar',
+                            'length' => 100,
+                            'not null' => TRUE)
+        ),
+        'unique keys' => array(
+            'term' => array('term')
+        ),
+        'primary key' => array('term')
+    );
+    
+    $schema['courses_meta'] = array(
+        'fields' => array(
+            'code' => array('type' => 'varchar',
+                            'length' => 100,
+                            'not null' => TRUE),
+            'name' => array('type' => 'varchar',
+                            'length' => 255,
+                            'not null' => TRUE),
+            'level' => array('type' => 'varchar',
+                             'length' => 100,
+                             'not null' => TRUE,
+                             'default' => 'undergraduate')
+        ),
+        'unique keys' => array(
+            'code' => array('code')
+        ),
+        'primary key' => array('code')
+    );
+    
+    $schema['courses_prereqs'] = array(
+        'fields' => array(
+            'id' => array('type' => 'serial',
+                          'unsigned' => TRUE,
+                          'not null' => TRUE),
+            'code' => array('type' => 'varchar',
+                            'length' => 100,
+                            'not null' => TRUE),
+            'required_code' => array('type' => 'varchar',
+                                     'length' => 100,
+                                    'not null' => TRUE)
+        ),
+        'unique keys' => array(
+            'id' => array('id'),
+            'code_required_code' => array('code', 'required_code')
+        ),
+        'primary key' => array('id')
+    );    
+    
+    $schema['courses'] = array(
+        'description' => t('Table for courses information.'),
+        'fields' => array(
+            'cid' => array('type' => 'serial',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'code' => array('type' => 'varchar',
+                            'length' => 100,
+                            'not null' => TRUE),
+            'program' => array('type' => 'text'),
+            'term' => array('type' => 'varchar',
+                            'length' => 100,
+                            'not null' => TRUE)
+        ),
+        'unique keys' => array(
+            'cid' => array('cid'),
+            'code_term' => array('code', 'term')
+        ),
+        'primary key' => array('cid')
+    );
+    
+    $schema['courses_staff'] = array(
+        'description' => t('Table for staff information related to a course.'),
+        'fields' => array(
+            'cid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'uid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'description' => array('type' => 'text')
+        ),
+        'unique keys' => array(
+            'cid_uid' => array('cid', 'uid')
+        ),
+        'primary key' => array('cid', 'uid')
+    );
+
+    $schema['courses_staff_hours'] = array(
+        'description' => t('Table for staff office hours.'),
+        'fields' => array(
+            'id' => array('type' => 'serial',
+                          'unsigned' => TRUE,
+                          'not null' => TRUE),
+            'cid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'uid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'description' => array('type' => 'varchar',
+                                   'length' => 255,
+                                   'not null' => TRUE),
+            'notes' => array('type' => 'text'),
+            'day' => array('type' => 'varchar',
+                           'length' => 3,
+                           'not null' => TRUE),
+            // 0 - 24
+            'start' => array('type' => 'int',
+                             'unsigned' => TRUE,
+                             'not null' => TRUE),
+            'end' => array('type' => 'int',
+                             'unsigned' => TRUE,
+                             'not null' => TRUE)                             
+        ),
+        'unique keys' => array(
+            'id' => array('id'),
+            'cid_uid_day_start_end' => array('cid', 'uid', 'day', 'start', 'end')
+        ),
+        'primary key' => array('id')
+    );
+    
+    $schema['courses_exams'] = array(
+        'fields' => array(
+            'id' => array('type' => 'serial',
+                          'unsigned' => TRUE,
+                          'not null' => TRUE),
+            'cid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE),
+            'description' => array('type' => 'varchar',
+                                   'length' => 255,
+                                   'not null' => TRUE),
+            'date' => array('type' => 'datetime',
+                            'not null' => TRUE),
+            'same_time' => array('type' => 'int',
+                                 'not null' => TRUE,
+                                 'default' => 0),
+            'same_place' => array('type' => 'int',
+                                  'not null' => TRUE,
+                                  'default' => 0),
+            'start' => array('type' => 'datetime',
+                             'default' => NULL),
+            'end' => array('type' => 'datetime', 'default' => NULL),
+            'location' => array('type' => 'varchar',
+                                'length' => 255,
+                                'default' => NULL),
+            'notes' => array('type' => 'text')
+        ),
+        'unique keys' => array(
+            'id' => array('id')
+        ),
+        'primary key' => array('id')
+    );
+    
+    $schema['courses_exams_dist'] = array(
+        'fields' => array(
+            'id' => array('type' => 'serial',
+                          'unsigned' => TRUE,
+                          'not null' => TRUE),
+            'exam_id' => array('type' => 'int',
+                               'unsigned' => TRUE,
+                               'not null' => TRUE),
+            'criteria' => array('type' => 'text'),
+            'start' => array('type' => 'datetime',
+                             'not null' => TRUE),
+            'end' => array('type' => 'datetime',
+                           'not null' => TRUE),
+            'location' => array('type' => 'varchar',
+                                'length' => 255,
+                                'not null' => TRUE)
+        ),
+        'unique keys' => array(
+            'id' => array('id')
+         ),
+         'primary key' => array('id')
+    );
+    
+    $schema['courses_nodes_files'] = array(
+        'fields' => array(
+            'vid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE,
+                           'default' => 0),
+            'nid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE,
+                           'default' => 0),
+            'fid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE,
+                           'default' => 0),
+            'cid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE,
+                           'default' => 0),
+            'tag' => array('type' => 'varchar',
+                           'length' => 255)
+        ),
+        'primary key' => array('vid', 'fid')
+    );
+    
+    $schema['courses_nodes'] = array(
+        'fields' => array(
+            'vid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE,
+                           'default' => 0),
+            'nid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE,
+                           'default' => 0),
+            'cid' => array('type' => 'int',
+                           'unsigned' => TRUE,
+                           'not null' => TRUE,
+                           'default' => 0)
+        ),
+        'primary key' => array('vid', 'cid')
+    );    
+    
+    
+    return $schema;
+}
+
+function courses_install() {
+    drupal_install_schema('courses');
+    
+    $t = get_t();
+    db_query("INSERT INTO {menu_custom} (menu_name, title, description) VALUES ('%s', '%s', '%s')", 'courses', $t('Courses Menu'), $t('This menu is used by the courses module to organize content.'));
+}
+
+function courses_uninstall() {
+    db_query('DELETE FROM {menu_custom} WHERE menu_name = \'courses\'');
+    db_query('DELETE FROM {menu_links} WHERE module = \'courses\'');
+    menu_rebuild();
+    
+    // Delete course-related nodes
+    $result = db_query('SELECT DISTINCT nid FROM {courses_nodes}');
+    while ($row = db_fetch_object($result)) {
+        node_delete($row->nid);
+    }
+    
+    drupal_uninstall_schema('courses');    
+}

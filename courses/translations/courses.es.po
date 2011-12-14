@@ -1,0 +1,620 @@
+# $Id$
+#
+# Spanish translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  courses.admin.inc: n/a
+#  courses.pages.inc: n/a
+#  courses.module: n/a
+#  courses.info: n/a
+#  courses.install: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2010-05-02 20:03-0500\n"
+"PO-Revision-Date: 2010-05-02 20:03-0500\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Spanish <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: courses.admin.inc:5;50;169;265 courses.pages.inc:74
+msgid "Code"
+msgstr "Código"
+
+#: courses.admin.inc:5;56;169;266
+msgid "Name"
+msgstr "Nombre"
+
+#: courses.admin.inc:5;62 courses.pages.inc:28;71
+msgid "Level"
+msgstr "Nivel"
+
+#: courses.admin.inc:5
+msgid "Offered in"
+msgstr "Ofrecido en"
+
+#: courses.admin.inc:5;124;169;599
+msgid "Operations"
+msgstr "Operaciones"
+
+#: courses.admin.inc:25;178
+msgid "edit"
+msgstr "editar"
+
+#: courses.admin.inc:26;887
+msgid "delete"
+msgstr "eliminar"
+
+#: courses.admin.inc:29;152;182;614
+msgid "No entries found."
+msgstr "No se encontraron entradas."
+
+#: courses.admin.inc:45
+msgid "Add Course"
+msgstr "Agregar Curso"
+
+#: courses.admin.inc:67;346;532
+msgid "Save"
+msgstr "Guardar"
+
+#: courses.admin.inc:77
+msgid "The course \"@course\" has been updated."
+msgstr "El curso \"@course\" ha sido actualizado."
+
+#: courses.admin.inc:85
+msgid "The course \"@course\" has been added."
+msgstr "El curso \"@course\" ha sido agregado."
+
+#: courses.admin.inc:103
+msgid "Are you sure you want to delete the course \"@course\"?"
+msgstr "Está seguro que desea eliminar el curso \"@course\"?"
+
+#: courses.admin.inc:105
+msgid "This will also delete all information related to this course. This action cannot be undone."
+msgstr "Toda la información relacionada con el curso se perderá. Esta acción no se puede deshacer."
+
+#: courses.admin.inc:106;245;416;610;675
+msgid "Delete"
+msgstr "Eliminar"
+
+#: courses.admin.inc:107;246;416;675
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: courses.admin.inc:111
+msgid "The course has been deleted."
+msgstr "El curso ha sido eliminado."
+
+#: courses.admin.inc:124 courses.pages.inc:77
+msgid "Term"
+msgstr "Período"
+
+#: courses.admin.inc:124;167
+msgid "Offered Courses"
+msgstr "Cursos Ofrecidos"
+
+#: courses.admin.inc:165
+msgid "This is the current term."
+msgstr "Este es el período actual."
+
+#: courses.admin.inc:177 courses.pages.inc:286
+msgid "view"
+msgstr "ver"
+
+#: courses.admin.inc:179
+msgid "delete offering"
+msgstr "eliminar oferta"
+
+#: courses.admin.inc:197
+msgid "Add Term"
+msgstr "Agregar Período"
+
+#: courses.admin.inc:201
+msgid "Term Name"
+msgstr "Nombre Período"
+
+#: courses.admin.inc:206
+msgid "Save Term"
+msgstr "Guardar Período"
+
+#: courses.admin.inc:223
+msgid "The term \"@term\" has been updated."
+msgstr "El período \"@term\" ha sido actualizado."
+
+#: courses.admin.inc:225
+msgid "The term \"@term\" has been added."
+msgstr "El período \"@term\" ha sido agregado."
+
+#: courses.admin.inc:242
+msgid "Are you sure you want to delete the term \"@term\"?"
+msgstr "Está seguro que desea eliminar el período \"@term\"?"
+
+#: courses.admin.inc:244
+msgid "This will also delete all course information related to this term. This action cannot be undone."
+msgstr "Toda la información de cursos relacionada con este período se perderá. Esta acción no se puede deshacer."
+
+#: courses.admin.inc:250
+msgid "The term has been deleted."
+msgstr "El período ha sido eliminado."
+
+#: courses.admin.inc:263
+msgid "Basic Info."
+msgstr "Información Básica"
+
+#: courses.admin.inc:268;329;495 courses.pages.inc:80
+msgid "Teachers"
+msgstr "Profesores"
+
+#: courses.admin.inc:278;330;496 courses.pages.inc:101
+msgid "Teaching Assistants"
+msgstr "Monitores"
+
+#: courses.admin.inc:301;346
+msgid "Add Course Offering"
+msgstr "Agregar Oferta de Curso"
+
+#: courses.admin.inc:314 courses.pages.inc:24 courses.module:548;690
+msgid "Course"
+msgstr "Curso"
+
+#: courses.admin.inc:320
+msgid "Program"
+msgstr "Programa"
+
+#: courses.admin.inc:340
+msgid "Staff"
+msgstr "Personal"
+
+#: courses.admin.inc:350
+msgid "Delete course offering"
+msgstr "Eliminar oferta de curso"
+
+#: courses.admin.inc:365
+msgid "The course @code - @name has been updated."
+msgstr "El curso @code - @name ha sido actualizado."
+
+#: courses.admin.inc:388
+msgid "The course \"@name\" has been added to term @term."
+msgstr "El curso \"@name\" está siendo ofrecido ahora en el período @term."
+
+#: courses.admin.inc:414
+msgid "Are you sure you want to delete the course \"@code - @name\"?"
+msgstr "Está seguro que desea eliminar el curso \"@code - @name\"?"
+
+#: courses.admin.inc:429
+msgid "The course and all its contents have been deleted."
+msgstr "El curso y todos sus contenidos fueron eliminados."
+
+#: courses.admin.inc:455 courses.pages.inc:379
+msgid "Mon"
+msgstr "Lun"
+
+#: courses.admin.inc:455 courses.pages.inc:379
+msgid "Tue"
+msgstr "Mar"
+
+#: courses.admin.inc:455 courses.pages.inc:379
+msgid "Wed"
+msgstr "Mie"
+
+#: courses.admin.inc:455 courses.pages.inc:379
+msgid "Thu"
+msgstr "Jue"
+
+#: courses.admin.inc:455 courses.pages.inc:379
+msgid "Fri"
+msgstr "View"
+
+#: courses.admin.inc:455 courses.pages.inc:379
+msgid "Sat"
+msgstr "Sab"
+
+#: courses.admin.inc:455 courses.pages.inc:379
+msgid "Sun"
+msgstr "Dom"
+
+#: courses.admin.inc:505
+msgid "Add staff hours"
+msgstr "Agregar horas de asesoría"
+
+#: courses.admin.inc:509
+msgid "Who"
+msgstr "Quién"
+
+#: courses.admin.inc:513
+msgid "What"
+msgstr "Qué"
+
+#: courses.admin.inc:517;718 courses.pages.inc:336
+msgid "Notes"
+msgstr "Notas"
+
+#: courses.admin.inc:588
+msgid "Staff hours updated."
+msgstr "Horario de atención actualizado."
+
+#: courses.admin.inc:599;639;713 courses.pages.inc:304;334
+msgid "Date"
+msgstr "Fecha"
+
+#: courses.admin.inc:599;634
+msgid "Description"
+msgstr "Descripción"
+
+#: courses.admin.inc:599;609 courses.pages.inc:338
+msgid "Distribution"
+msgstr "Distribución"
+
+#: courses.admin.inc:607
+msgid "Yes"
+msgstr "Sí"
+
+#: courses.admin.inc:607
+msgid "No"
+msgstr "No"
+
+#: courses.admin.inc:608 courses.module:205
+msgid "Edit"
+msgstr "Editar"
+
+#: courses.admin.inc:629
+msgid "Edit \"@exam\""
+msgstr "Editar \"@exam\""
+
+#: courses.admin.inc:630
+msgid "Program Exam"
+msgstr "Programar Examen"
+
+#: courses.admin.inc:646
+msgid "Program exam"
+msgstr "Programar examen"
+
+#: courses.admin.inc:658
+msgid "The exam \"@exam\" has been updated."
+msgstr "El examen \"@exam\" ha sido actualizado."
+
+#: courses.admin.inc:664
+msgid "The exam \"@exam\" has been added to this course."
+msgstr "El examen \"@exam\" ha sido agregado a este curso."
+
+#: courses.admin.inc:674
+msgid "Are you sure you want to delete the exam \"@desc\"?"
+msgstr "Está seguro que desea eliminar el examen \"@desc\"?"
+
+#: courses.admin.inc:687
+msgid "The exam has been deleted."
+msgstr "El examen fue eliminado."
+
+#: courses.admin.inc:710
+msgid "General config."
+msgstr "Configuración General"
+
+#: courses.admin.inc:771
+msgid "Save exam configuration"
+msgstr "Guardar configuración de examen"
+
+#: courses.admin.inc:828
+msgid "Exam config. updated"
+msgstr "Configuración de examen actualizada"
+
+#: courses.admin.inc:850
+msgid "Criterion"
+msgstr "Criterio"
+
+#: courses.admin.inc:857;862
+msgid "Starting time"
+msgstr "Hora de inicio"
+
+#: courses.admin.inc:858;869
+msgid "Ending time"
+msgstr "Hora de finalización"
+
+#: courses.admin.inc:876;880 courses.pages.inc:348;350
+msgid "Location"
+msgstr "Lugar"
+
+#: courses.admin.inc:898 courses.module:260
+msgid "Exam distribution"
+msgstr "Distribución de examen"
+
+#: courses.admin.inc:902
+msgid "There is no need for additional configuration."
+msgstr "No es necesaria configuración adicional."
+
+#: courses.admin.inc:924
+msgid "Add criterion"
+msgstr "Agregar criterio"
+
+#: courses.admin.inc:939
+msgid "Save exam distribution"
+msgstr "Guardar distribución de examen"
+
+#: courses.admin.inc:995
+msgid "Exam distribution updated."
+msgstr "Distribución de examen actualizada."
+
+#: courses.pages.inc:18 courses.module:1030
+msgid "Home"
+msgstr "Inicio"
+
+#: courses.pages.inc:19 courses.module:1031;123;130 courses.info:0
+msgid "Courses"
+msgstr "Cursos"
+
+#: courses.pages.inc:22
+msgid "Term @term"
+msgstr "Período @term"
+
+#: courses.pages.inc:24
+msgid "Course Code"
+msgstr "Código Curso"
+
+#: courses.pages.inc:52
+msgid "No courses found."
+msgstr "No se encontraron cursos."
+
+#: courses.pages.inc:91
+msgid "Office @office"
+msgstr "Oficina @office"
+
+#: courses.pages.inc:140
+msgid "News"
+msgstr "Anuncios"
+
+#: courses.pages.inc:154
+msgid "There are no recent news items."
+msgstr "No hay anuncios recientes."
+
+#: courses.pages.inc:162
+msgid "Upcoming exams"
+msgstr "Próximas evaluaciones"
+
+#: courses.pages.inc:176
+msgid "There are no upcoming exams in this course."
+msgstr "No hay evaluaciones futuras programadas en este curso."
+
+#: courses.pages.inc:200 courses.module:450;889
+msgid "Problem Set"
+msgstr "Taller"
+
+#: courses.pages.inc:200;237 courses.module:895
+msgid "Solution"
+msgstr "Solución"
+
+#: courses.pages.inc:212;249
+msgid "download"
+msgstr "descargar"
+
+#: courses.pages.inc:215;252
+msgid "Download solution"
+msgstr "Descargar solución"
+
+#: courses.pages.inc:223
+msgid "No problem sets found."
+msgstr "No hay talleres disponibles."
+
+#: courses.pages.inc:237;304 courses.module:892
+msgid "Exam"
+msgstr "Examen"
+
+#: courses.pages.inc:260
+msgid "No exams found."
+msgstr "No hay examenes disponibles."
+
+#: courses.pages.inc:274
+msgid "Class Note"
+msgstr "Notas de clase"
+
+#: courses.pages.inc:290
+msgid "No class notes found."
+msgstr "No hay notas de clase disponibles."
+
+#: courses.pages.inc:315
+msgid "View details"
+msgstr "Ver detalles"
+
+#: courses.pages.inc:318
+msgid "No exams programmed."
+msgstr "No hay evaluaciones programadas."
+
+#: courses.pages.inc:346;350
+msgid "Time"
+msgstr "Hora"
+
+#: courses.module:199
+msgid "Info"
+msgstr "Información"
+
+#: courses.module:215;145
+msgid "Delete course"
+msgstr "Eliminar curso"
+
+#: courses.module:224
+msgid "Staff Hours"
+msgstr "Horarios de atención"
+
+#: courses.module:233
+msgid "Delete staff hour"
+msgstr "Eliminar horas de atención"
+
+#: courses.module:242
+msgid "Exams"
+msgstr "Evaluaciones"
+
+#: courses.module:251
+msgid "Edit exam"
+msgstr "Editar evaluación"
+
+#: courses.module:278
+msgid "Delete exam"
+msgstr "Eliminar evaluación"
+
+#: courses.module:287
+msgid "Content"
+msgstr "Contenido"
+
+#: courses.module:436
+msgid "Undergraduate"
+msgstr "Pregrado"
+
+#: courses.module:437
+msgid "Graduate"
+msgstr "Posgrado"
+
+#: courses.module:452
+msgid "A course problem set. May include solutions."
+msgstr "Taller para un curso. Puede incluir soluciones."
+
+#: courses.module:455
+msgid "Course Exam"
+msgstr "Examen"
+
+#: courses.module:457
+msgid "A course exam. May include solutions."
+msgstr "El tema de un examen para un curso. Puede incluir soluciones."
+
+#: courses.module:460
+msgid "Class Notes"
+msgstr "Notas de clase"
+
+#: courses.module:462
+msgid "Class notes."
+msgstr "Notas de clase."
+
+#: courses.module:466
+msgid "Course news item"
+msgstr "Anuncio en un curso"
+
+#: courses.module:468
+msgid "Used for course-related announcements."
+msgstr "Utilizado para anuncios y noticias relacionadas con un curso."
+
+#: courses.module:704;710
+msgid "Exam file"
+msgstr "Archivo de examen"
+
+#: courses.module:716;722;742;748
+msgid "Solution file"
+msgstr "Archivo de solución"
+
+#: courses.module:730;736
+msgid "Problem Set file"
+msgstr "Archivo del taller"
+
+#: courses.module:763
+msgid "A problem set file is required."
+msgstr "Un archivo para el taller es requerido."
+
+#: courses.module:765
+msgid "An exam file is required."
+msgstr "Un archivo con el tema del examen es requerido."
+
+#: courses.module:918
+msgid "Course navigation"
+msgstr "Navegación de curso"
+
+#: courses.module:926
+msgid "Current term courses administration"
+msgstr "Enlaces de administración de cursos del período actual"
+
+#: courses.module:939
+msgid "Course block"
+msgstr ""
+
+#: courses.module:944
+msgid "!term Courses admin"
+msgstr "Admin. cursos !term"
+
+#: courses.module:431
+msgid "administer courses"
+msgstr "administrar cursos"
+
+#: courses.module:432
+msgid "create courses content"
+msgstr "crear contenido de cursos"
+
+#: courses.module:5
+msgid "Undergraduate Courses"
+msgstr "Cursos de Pregrado"
+
+#: courses.module:15
+msgid "Graduate Courses"
+msgstr "Cursos de Posgrado"
+
+#: courses.module:50
+msgid "Programa"
+msgstr "Programa"
+
+#: courses.module:60
+msgid "Horarios de atención y talleres"
+msgstr "Horarios de atención y talleres"
+
+#: courses.module:70
+msgid "Talleres"
+msgstr "Talleres"
+
+#: courses.module:79
+msgid "Exámenes"
+msgstr "Exámenes"
+
+#: courses.module:88
+msgid "Notas de clase"
+msgstr "Notas de clase"
+
+#: courses.module:97
+msgid "Programación de evaluaciones"
+msgstr "Programación de evaluaciones"
+
+#: courses.module:107
+msgid "Exam details"
+msgstr "Detalles de evaluación"
+
+#: courses.module:137;189
+msgid "Course Information"
+msgstr "Información del Curso"
+
+#: courses.module:153
+msgid "Terms"
+msgstr "Períodos"
+
+#: courses.module:160
+msgid "Courses Term"
+msgstr "Cursos del período"
+
+#: courses.module:171
+msgid "Edit Term"
+msgstr "Editar Período"
+
+#: courses.module:180
+msgid "Delete Term"
+msgstr "Eliminar Período"
+
+#: courses.install:56
+msgid "Table for courses information."
+msgstr "Tabla para información de cursos."
+
+#: courses.install:77
+msgid "Table for staff information related to a course."
+msgstr "Tabla para información del personal asociado a un curso."
+
+#: courses.install:94
+msgid "Table for staff office hours."
+msgstr "Tabla para horarios de atención del personal de cursos."
+
+#: (duplicate) courses.install:233 
+msgid "Courses Menu"
+msgstr "Menú de Cursos"
+
+#: (duplicate) courses.install:233 
+msgid "This menu is used by the courses module to organize content."
+msgstr "Este menú es utilizado para organizar el contenido de los cursos."
+
+#: courses.info:0
+msgid "Escuela de matemáticas"
+msgstr ""
+
