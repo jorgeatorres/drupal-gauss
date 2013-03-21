@@ -18,8 +18,8 @@
 				<dt><?php echo t('Extension'); ?></dt>
 				<dd><?php echo $account->profile->extension ? $account->profile->extension : '--'; ?></dd>	
 
-                                <dt><?php echo t('WebPage'); ?></dt>
-                                <dd><?php echo $account->profile->links ? $account->profile->links : '--'; ?></dd>
+        <dt><?php echo t('WebPage'); ?></dt>
+        <dd><?php echo $account->profile->links ? '<a href="' . $account->profile->links . '" target="_blank">' .  $account->profile->links . '</a>' : '--'; ?></dd>
 
 				<dt><?php echo t('Bio'); ?></dt>
 				<dd><?php echo $account->profile->bio ? check_markup($account->profile->bio, 'filtered_html') : '--'; ?></dd>

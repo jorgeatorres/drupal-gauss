@@ -101,7 +101,7 @@ function gauss_mail_user_login_validate($form, &$form_state) {
 
 function gauss_profile_save(&$edit, &$user) {
     db_query('DELETE FROM {un_user_profile} WHERE uid = ?', array($user->uid));
-    db_query("INSERT INTO {un_user_profile} (uid, name, title, office, extension, interests, bio) VALUES(?, ?, ?, ?, ?, ?, ?)", array($user->uid, $edit['full_name'], $edit['title'], $edit['office'], $edit['extension'], $edit['interests'], $edit['bio']));
+    db_query("INSERT INTO {un_user_profile} (uid, name, title, office, extension, interests, bio, links) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", array($user->uid, $edit['full_name'], $edit['title'], $edit['office'], $edit['extension'], $edit['interests'], $edit['bio'], $edit['links']));
     
     $edit['full_name'] = NULL;
     $edit['title'] = NULL;
@@ -109,6 +109,7 @@ function gauss_profile_save(&$edit, &$user) {
     $edit['extension'] = NULL;
     $edit['interests'] = NULL;
     $edit['bio'] = NULL;
+    $edit['links'] = NULL;
 }
 
 function gauss_profile_form(&$edit, &$user) {
@@ -139,11 +140,16 @@ function gauss_profile_form(&$edit, &$user) {
                                     '#title' => t('Bio'),
                                     '#default_value' => isset($user->profile) ? $user->profile->bio : '',
                                     '#rows' => 5);
+    $form['profile']['links'] = array('#type' => 'textfield',
+                                      '#title' => t('WebSite'),
+                                      '#default_value' => isset($user->profile) ? $user->profile->links : '',
+                                      '#size' => 40,
+                                      '#maxlength' => 255);
     return $form;
 }
 
 function gauss_load_profile(&$user) {
-    $res = db_query('SELECT name, title, office, extension, interests, bio FROM {un_user_profile} WHERE uid = ?', array($user->uid));
+    $res = db_query('SELECT name, title, office, extension, interests, bio, links FROM {un_user_profile} WHERE uid = ?', array($user->uid));
     $profile = $res->fetchObject();
     $user->profile = $profile ? $profile : NULL;
     
