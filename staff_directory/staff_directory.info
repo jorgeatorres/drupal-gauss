@@ -1,5 +1,5 @@
 name = Staff directory
 package = Escuela de matemáticas
 version = 0.1
-core = 6.x
+core = 7.x
 dependencies[] = gauss
