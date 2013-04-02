@@ -1,7 +1,7 @@
 <?php
 function gauss_schema() {
 
-    $schema['user_profile'] = array(
+    $schema['un_user_profile'] = array(
         'description' => t('Table for extending user info.'),
         'fields' => array(
             'uid' => array('type' => 'int',
@@ -33,26 +33,26 @@ function gauss_schema() {
 }
 
 function gauss_install() {
-    drupal_install_schema('gauss');
+    // drupal_install_schema('gauss');
     
-    db_query("INSERT INTO {role} (name) VALUES('%s')", 'administrator');
-    db_query("INSERT INTO {role} (name) VALUES('%s')", 'teacher');
-    db_query("INSERT INTO {role} (name) VALUES('%s')", 'teaching assistant');    
-    db_query("INSERT INTO {role} (name) VALUES('%s')", 'staff');
+    db_query("INSERT INTO {role} (name) VALUES (?)", array('administrator'));
+    db_query("INSERT INTO {role} (name) VALUES (?)", array('teacher'));
+    db_query("INSERT INTO {role} (name) VALUES (?)", array('teaching assistant'));
+    db_query("INSERT INTO {role} (name) VALUES (?)", array('staff'));
 }
 
 function gauss_uninstall() {
     $roles = array('administrator', 'teacher', 'teaching assistant', 'staff');
     
     foreach ($roles as $role) {
-        $rid = db_result(db_query('SELECT rid FROM {role} WHERE name=\'%s\'', $role));
-        db_query('DELETE FROM {users_roles} WHERE rid = %d', $rid);
-        db_query('DELETE FROM {role} WHERE rid = %d', $rid);
+        $rid = db_query('SELECT rid FROM {role} WHERE name=?', array($role))->fetchField();
+        db_query('DELETE FROM {users_roles} WHERE rid = ?', array($rid));
+        db_query('DELETE FROM {role} WHERE rid = ?', array($rid));
     }
     
     db_query('DELETE FROM {menu_links} WHERE module = \'gauss\'');
     menu_cache_clear_all();
 
-    drupal_uninstall_schema('gauss');
+    // drupal_uninstall_schema('gauss');
 }
 

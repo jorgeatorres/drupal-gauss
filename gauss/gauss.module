@@ -17,32 +17,51 @@ function gauss_perm() {
     return array('access math department administration');
 }
 
-function gauss_user($type, &$edit, &$user, $category = NULL) {
-    switch ($type) {
-        case 'load':
-            return gauss_load_profile($user);
-        case 'submit':
-            $edit['name'] = check_plain($edit['full_name']);
-            break;
-        case 'insert':
-            user_save($user, array('name' => check_plain($edit['full_name']),
-                                   'full_name' => $edit['full_name']));
-            break;
-        case 'form':
-            return gauss_profile_form($edit, $user);
-        case 'update':
-            return gauss_profile_save($edit, $user);
-        case 'delete':
-            db_query('DELETE FROM {user_profile} WHERE uid = %d', $user->uid);
-            break;
+function gauss_user_load($users) {
+    foreach (array_keys($users) as $uid) {
+        gauss_load_profile($users[$uid]);
     }
+}
+
+function gauss_form_user_profile_form_alter(&$form, &$form_state, $form_id) {
+    $user = $form['#user'];
+    $form_in = gauss_profile_form($form_state, $user);
+
+    $form = array_merge($form, $form_in);
+}
+
+function gauss_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+    return gauss_form_user_profile_form_alter($form, $form_state, $form_id);
+}
+
+function gauss_user_update(&$edit, $account, $category) {
+    gauss_profile_save($edit, $account);
+}
+
+// function gauss_user($type, &$edit, &$user, $category = NULL) {
+//     switch ($type) {
+//         case 'submit':
+//             $edit['name'] = check_plain($edit['full_name']);
+//             break;
+//         case 'insert':
+//             user_save($user, array('name' => check_plain($edit['full_name']),
+//                                    'full_name' => $edit['full_name']));
+//             break;
+// }
+
+function gauss_user_insert(&$edit, $account, $category) {
+    gauss_profile_save($edit, $account);
+}
+
+function gauss_user_delete($account) {
+    db_query('DELETE FROM {un_user_profile} WHERE uid=?', array($account->uid));
 }
 
 function gauss_form_alter(&$form, &$form_state, $form_id) {
     switch ($form_id) {
         case 'user_profile_form':
-            $account = $form['_account']['#value'];
-            $form['account']['name'] = array('#type' => 'value', '#value' => time());
+            $account = $form['#user'];
+            // $form['account']['name'] = array('#type' => 'value', '#value' => time());
             $form['account']['full_name'] = array('#type' => 'textfield',
                                                   '#title' => t('Name'),
                                                   '#default_value' => $account->profile ? $account->profile->name : $account->name,
@@ -50,43 +69,24 @@ function gauss_form_alter(&$form, &$form_state, $form_id) {
                                                   '#required' => TRUE,
                                                   '#weight' => -10);
             break;
-        case 'user_register':
-            $form['account']['name'] = array('#type' => 'value', '#value' => time());
+        case 'user_register_form':
+            // $form['account']['name'] = array('#type' => 'value', '#value' => time());
             $form['account']['full_name'] = array('#type' => 'textfield',
                                        '#title' => t('Name'),
                                        '#maxlength' => 255,
                                        '#required' => TRUE,
                                        '#weight' => -10);
             break;
-        case 'user_login':
-            $form['name']['#title'] = t('E-mail');
-            $form['name']['#description'] = t('Enter your e-mail address.');
-            $form['name']['#element_validate'][] = 'gauss_mail_user_login_validate';
-            break;
-        case 'user_login_block':
-            $form['name']['#title'] = t('E-mail');
-            $form['name']['#element_validate'][] = 'gauss_mail_user_login_validate';            
+        // case 'user_login':
+        //     $form['name']['#title'] = t('E-mail');
+        //     $form['name']['#description'] = t('Enter your e-mail address.');
+        //     $form['name']['#element_validate'][] = 'gauss_mail_user_login_validate';
+        //     break;
+        // case 'user_login_block':
+        //     $form['name']['#title'] = t('E-mail');
+        //     $form['name']['#element_validate'][] = 'gauss_mail_user_login_validate';            
         default:
             break;
-    }
-}
-
-// XXX kind of hacky
-function gauss_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-    if ($op == 'view' && $a4) {
-        switch ($node->type) {
-            default:
-                break;
-            case 'story':
-                drupal_set_breadcrumb(array(l(t('Home'), '<front>'),
-                                            l('Noticias', 'noticias')));
-                break;
-            case 'event':
-                drupal_set_breadcrumb(array(l(t('Home'), '<front>'),
-                                            l('Noticias y Eventos', 'noticias'),
-                                            l('Calendario', 'calendario')));                
-                break;
-        }
     }
 }
 
@@ -100,8 +100,8 @@ function gauss_mail_user_login_validate($form, &$form_state) {
 }
 
 function gauss_profile_save(&$edit, &$user) {
-    db_query('DELETE FROM {user_profile} WHERE uid = %d', $user->uid);
-    db_query("INSERT INTO {user_profile} (uid, name, title, office, extension, interests, bio) VALUES(%d, '%s', '%s', '%s', '%s', '%s', '%s')", $user->uid, $edit['full_name'], $edit['title'], $edit['office'], $edit['extension'], $edit['interests'], $edit['bio']);
+    db_query('DELETE FROM {un_user_profile} WHERE uid = ?', array($user->uid));
+    db_query("INSERT INTO {un_user_profile} (uid, name, title, office, extension, interests, bio, links) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", array($user->uid, $edit['full_name'], $edit['title'], $edit['office'], $edit['extension'], $edit['interests'], $edit['bio'], $edit['links']));
     
     $edit['full_name'] = NULL;
     $edit['title'] = NULL;
@@ -109,6 +109,7 @@ function gauss_profile_save(&$edit, &$user) {
     $edit['extension'] = NULL;
     $edit['interests'] = NULL;
     $edit['bio'] = NULL;
+    $edit['links'] = NULL;
 }
 
 function gauss_profile_form(&$edit, &$user) {
@@ -118,77 +119,41 @@ function gauss_profile_form(&$edit, &$user) {
                              '#title' => t('University Profile'));
     $form['profile']['title'] = array('#type' => 'textfield',
                                       '#title' => t('Title'),
-                                      '#default_value' => $user->profile ? $user->profile->title : '',
+                                      '#default_value' => isset($user->profile) ? $user->profile->title : '',
                                       '#size' => 40,
                                       '#maxlength' => 255);
     $form['profile']['office'] = array('#type' => 'textfield',
                                       '#title' => t('Office'),
-                                      '#default_value' => $user->profile ? $user->profile->office : '',
+                                      '#default_value' => isset($user->profile) ? $user->profile->office : '',
                                       '#size' => 20,
                                       '#maxlength' => 20);
     $form['profile']['extension'] = array('#type' => 'textfield',
                                           '#title' => t('Tel. Extension'),
-                                          '#default_value' => $user->profile ? $user->profile->extension : '',
+                                          '#default_value' => isset($user->profile) ? $user->profile->extension : '',
                                           '#size' => 20,
                                           '#maxlength' => 20);                                      
     $form['profile']['interests'] = array('#type' => 'textarea',
                                           '#title' => t('Interests'),
-                                          '#default_value' => $user->profile ? $user->profile->interests : '',
+                                          '#default_value' => isset($user->profile) ? $user->profile->interests : '',
                                           '#rows' => 2);                                        
     $form['profile']['bio'] = array('#type' => 'textarea',
                                     '#title' => t('Bio'),
-                                    '#default_value' => $user->profile ? $user->profile->bio : '',
+                                    '#default_value' => isset($user->profile) ? $user->profile->bio : '',
                                     '#rows' => 5);
+    $form['profile']['links'] = array('#type' => 'textfield',
+                                      '#title' => t('WebSite'),
+                                      '#default_value' => isset($user->profile) ? $user->profile->links : '',
+                                      '#size' => 40,
+                                      '#maxlength' => 255);
     return $form;
 }
 
 function gauss_load_profile(&$user) {
-    $res = db_query('SELECT name, title, office, extension, interests, bio FROM {user_profile} WHERE uid = %d', $user->uid);
-    $profile = db_fetch_object($res);
+    $res = db_query('SELECT name, title, office, extension, interests, bio, links FROM {un_user_profile} WHERE uid = ?', array($user->uid));
+    $profile = $res->fetchObject();
     $user->profile = $profile ? $profile : NULL;
     
-    $user->profile->name = $user->profile->name ? $user->profile->name : $user->name;
-}
-
-function gauss_weekdays() {
-    return array('Mon' => t('Monday'),
-                 'Tue' => t('Tuesday'),
-                 'Wed' => t('Wednesday'),
-                 'Thu' => t('Thursday'),
-                 'Fri' => t('Friday'),
-                 'Sat' => t('Saturday'),
-                 'Sun' => t('Sunday'));
-}
-
-function gauss_full_primary_links_menu() {
-    $tree = gauss_menu_find_active_trail(menu_tree_all_data('primary-links'));
-    $output = menu_tree_output($tree);
-    return $output;
-}
-
-function gauss_menu_find_active_trail(&$menu_tree) {
-    $item = menu_get_item();
-    _gauss_menu_find_active_trail($menu_tree, $item);
-    return $menu_tree;
-}
-
-function _gauss_menu_find_active_trail(&$menu_tree, $item) {
-  $level_is_expanded = FALSE;
-  foreach($menu_tree as &$menu_item) {
-    $link = &$menu_item['link'];
-    if ($link['href']==$item['href']) { // Found the exact location in the tree
-      $link['active'] = TRUE;
-      $link['in_active_trail'] = TRUE;
-      return true;
-    } else {
-      if ($link['has_children']) {
-        $result = _gauss_menu_find_active_trail($menu_item['below'], $item);
-        $link['in_active_trail'] = $result;
-        if ($result) $level_is_expanded = TRUE;
-      }
-    }
-  }
-  return $level_is_expanded;
+    $user->profile->name = isset($user->profile->name) ? $user->profile->name : $user->name;
 }
 
 function gauss_roles($id = NULL) {

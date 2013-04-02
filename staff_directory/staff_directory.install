@@ -41,11 +41,11 @@ function staff_directory_schema() {
 }
 
 function staff_directory_install() {
-    drupal_install_schema('staff_directory');
+    // drupal_install_schema('staff_directory');
 }
 
 function staff_directory_uninstall() {
-    drupal_uninstall_schema('staff_directory');
+    // drupal_uninstall_schema('staff_directory');
     
     db_query('DELETE FROM {menu_links} WHERE module = \'staff_directory\'');
     menu_cache_clear_all();
